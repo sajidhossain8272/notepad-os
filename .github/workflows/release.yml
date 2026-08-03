@@ -54,6 +54,6 @@ jobs:
           tagName: v__VERSION__
           releaseName: 'Notepad OS v__VERSION__'
           releaseBody: 'See the attached assets to download Notepad OS for your desktop operating system.'
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}

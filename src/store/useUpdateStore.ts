@@ -59,8 +59,13 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
 
     if (success) {
       if (typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window) {
-        alert('Update downloaded successfully! Restarting Nodepad OS...');
-        window.location.reload();
+        try {
+          const { relaunch } = await import('@tauri-apps/plugin-process');
+          await relaunch();
+        } catch (err) {
+          console.warn('[Updater] relaunch plugin error, falling back to reload:', err);
+          window.location.reload();
+        }
       } else {
         alert('Update downloaded successfully! Please restart the application.');
         set({ isDownloading: false, isUpdateModalOpen: false });

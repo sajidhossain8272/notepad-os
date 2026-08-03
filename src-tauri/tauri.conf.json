@@ -29,7 +29,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVEMEFBNUI1NzdBMUVDNEQKUldUdENxVDFkNkhzVFhTRTRvSVlTbWlXWVZZeHZteXVqMS9FWVptamRZZzc5VzlZQjNYd2ltSHk=",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDJBNDkxRDVGREY0MUIyOTkKUldTWnNrSGZYeDFKS2tKSHV4ODh1VUZ6aFJIUWVZc3liNVcwSUlOYUlaM01HQTYyTC9FWTJZY1QK",
       "endpoints": [
         "https://github.com/sajidhossain8272/notepad-os/releases/latest/download/latest.json"
       ]

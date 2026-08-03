@@ -6,7 +6,20 @@ import { BrandIcon } from './BrandIcon';
 export const WindowHeader: React.FC = () => {
   const { settings, cycleTheme } = useSettingsStore();
 
-  const handleMinimize = async () => {
+  const handleStartDragging = async (e: React.MouseEvent) => {
+    if (e.button === 0 && isTauriEnv()) {
+      try {
+        const { getCurrentWindow } = await import('@tauri-apps/api/window');
+        const appWindow = getCurrentWindow();
+        await appWindow.startDragging();
+      } catch (err) {
+        console.error('Failed to drag window:', err);
+      }
+    }
+  };
+
+  const handleMinimize = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (isTauriEnv()) {
       try {
         const { getCurrentWindow } = await import('@tauri-apps/api/window');
@@ -18,7 +31,8 @@ export const WindowHeader: React.FC = () => {
     }
   };
 
-  const handleMaximize = async () => {
+  const handleMaximize = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (isTauriEnv()) {
       try {
         const { getCurrentWindow } = await import('@tauri-apps/api/window');
@@ -30,7 +44,8 @@ export const WindowHeader: React.FC = () => {
     }
   };
 
-  const handleClose = async () => {
+  const handleClose = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (isTauriEnv()) {
       try {
         const { getCurrentWindow } = await import('@tauri-apps/api/window');
@@ -45,7 +60,8 @@ export const WindowHeader: React.FC = () => {
   return (
     <div
       data-tauri-drag-region
-      className="h-7 select-none flex items-center justify-between px-1.5 py-1 text-white font-bold text-xs shadow-sm bg-[var(--header-bg)] text-[var(--header-text)]"
+      onMouseDown={handleStartDragging}
+      className="h-7 select-none flex items-center justify-between px-1.5 py-1 text-white font-bold text-xs shadow-sm bg-[var(--header-bg)] text-[var(--header-text)] cursor-grab active:cursor-grabbing"
     >
       {/* Title & App Icon */}
       <div className="flex items-center gap-1.5 pointer-events-none">
@@ -58,10 +74,14 @@ export const WindowHeader: React.FC = () => {
       </div>
 
       {/* Window Controls */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 z-50">
         {/* Theme indicator quick button */}
         <button
-          onClick={cycleTheme}
+          onClick={(e) => {
+            e.stopPropagation();
+            cycleTheme();
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
           title="Cycle Theme (Ctrl+Shift+T)"
           className="text-[10px] px-1.5 py-0.5 rounded bg-black/20 hover:bg-black/40 text-white font-mono uppercase tracking-wider transition-colors mr-2 border border-white/20"
         >
@@ -71,6 +91,7 @@ export const WindowHeader: React.FC = () => {
         {/* Minimize Button */}
         <button
           onClick={handleMinimize}
+          onMouseDown={(e) => e.stopPropagation()}
           className="w-4 h-4 bg-win95-bg hover:bg-gray-300 text-black font-bold text-[10px] flex items-center justify-center border border-t-white border-l-white border-r-gray-800 border-b-gray-800 active:border-t-gray-800 active:border-l-gray-800 active:border-r-white active:border-b-white"
           title="Minimize"
         >
@@ -80,6 +101,7 @@ export const WindowHeader: React.FC = () => {
         {/* Maximize Button */}
         <button
           onClick={handleMaximize}
+          onMouseDown={(e) => e.stopPropagation()}
           className="w-4 h-4 bg-win95-bg hover:bg-gray-300 text-black font-bold text-[10px] flex items-center justify-center border border-t-white border-l-white border-r-gray-800 border-b-gray-800 active:border-t-gray-800 active:border-l-gray-800 active:border-r-white active:border-b-white"
           title="Maximize"
         >
@@ -89,6 +111,7 @@ export const WindowHeader: React.FC = () => {
         {/* Close Button */}
         <button
           onClick={handleClose}
+          onMouseDown={(e) => e.stopPropagation()}
           className="w-4 h-4 bg-win95-bg hover:bg-red-600 hover:text-white text-black font-bold text-[10px] flex items-center justify-center border border-t-white border-l-white border-r-gray-800 border-b-gray-800 active:border-t-gray-800 active:border-l-gray-800 active:border-r-white active:border-b-white"
           title="Close"
         >

@@ -1,0 +1,117 @@
+@import './themes.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  /* Classic Win95 Outset Bevel (Raised button / window pane) */
+  .win95-outset {
+    background-color: var(--panel-bg);
+    box-shadow: 
+      inset 1px 1px var(--border-light), 
+      inset -1px -1px var(--border-darkest), 
+      inset 2px 2px var(--panel-bg), 
+      inset -2px -2px var(--border-dark);
+  }
+
+  /* Classic Win95 Inset Bevel (Sunken text area / edit box) */
+  .win95-inset {
+    background-color: var(--editor-bg);
+    box-shadow: 
+      inset 1px 1px var(--border-dark), 
+      inset -1px -1px var(--border-light), 
+      inset 2px 2px var(--border-darkest), 
+      inset -2px -2px var(--panel-bg);
+  }
+
+  /* Active pressed Win95 button */
+  .win95-pressed {
+    background-color: var(--panel-bg);
+    box-shadow: 
+      inset 1px 1px var(--border-darkest), 
+      inset -1px -1px var(--border-light), 
+      inset 2px 2px var(--border-dark), 
+      inset -2px -2px var(--panel-bg);
+  }
+}
+
+/* Base resets & typography */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: 'MS Sans Serif', Tahoma, Geneva, sans-serif;
+  user-select: none;
+}
+
+/* Custom Win95 Retro Scrollbars */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+  background-color: var(--panel-bg);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--panel-bg);
+  box-shadow: inset 1px 1px var(--border-dark), inset -1px -1px var(--border-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--panel-bg);
+  box-shadow: 
+    inset 1px 1px var(--border-light), 
+    inset -1px -1px var(--border-darkest), 
+    inset 2px 2px var(--panel-bg), 
+    inset -2px -2px var(--border-dark);
+}
+
+::-webkit-scrollbar-button {
+  width: 16px;
+  height: 16px;
+  background-color: var(--panel-bg);
+  box-shadow: 
+    inset 1px 1px var(--border-light), 
+    inset -1px -1px var(--border-darkest), 
+    inset 2px 2px var(--panel-bg), 
+    inset -2px -2px var(--border-dark);
+}
+
+/* CRT Scanline Overlay for Terminal Green Theme */
+.crt-scanlines {
+  display: var(--scanlines-display);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+  z-index: 99;
+}
+
+/* CodeMirror customization */
+.cm-editor {
+  height: 100% !important;
+  background-color: var(--editor-bg) !important;
+  color: var(--editor-text) !important;
+}
+
+.cm-gutters {
+  background-color: var(--panel-bg) !important;
+  color: var(--text-muted) !important;
+  border-right: 1px solid var(--border-dark) !important;
+}
+
+.cm-content {
+  font-family: inherit !important;
+}

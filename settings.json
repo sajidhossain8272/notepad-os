@@ -1,0 +1,9 @@
+{
+  "theme": "windows-95",
+  "fontSize": 14,
+  "fontFamily": "win95",
+  "showPreview": true,
+  "autoSave": true,
+  "wordWrap": true,
+  "sidebarWidth": 260
+}

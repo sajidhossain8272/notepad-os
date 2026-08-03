@@ -1,0 +1,77 @@
+/* Theme variable definitions & Win95 retro UI styles */
+
+:root {
+  --bg-color: #c0c0c0;
+  --panel-bg: #c0c0c0;
+  --header-bg: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+  --header-text: #ffffff;
+  --text-main: #000000;
+  --text-muted: #555555;
+  --border-light: #ffffff;
+  --border-dark: #808080;
+  --border-darkest: #000000;
+  --editor-bg: #ffffff;
+  --editor-text: #000000;
+  --selection-bg: #000080;
+  --selection-text: #ffffff;
+  --active-item-bg: #000080;
+  --active-item-text: #ffffff;
+  --scanlines-display: none;
+}
+
+[data-theme="windows-xp"] {
+  --bg-color: #ece9d8;
+  --panel-bg: #f3f0e0;
+  --header-bg: linear-gradient(180deg, #0058e6 0%, #003b9e 100%);
+  --header-text: #ffffff;
+  --text-main: #000000;
+  --text-muted: #4a4a4a;
+  --border-light: #ffffff;
+  --border-dark: #7f9db9;
+  --border-darkest: #426085;
+  --editor-bg: #ffffff;
+  --editor-text: #000000;
+  --selection-bg: #316ac5;
+  --selection-text: #ffffff;
+  --active-item-bg: #316ac5;
+  --active-item-text: #ffffff;
+  --scanlines-display: none;
+}
+
+[data-theme="terminal-green"] {
+  --bg-color: #050a05;
+  --panel-bg: #0d140d;
+  --header-bg: #002b11;
+  --header-text: #00ff66;
+  --text-main: #00ff66;
+  --text-muted: #008833;
+  --border-light: #006622;
+  --border-dark: #004415;
+  --border-darkest: #00ff66;
+  --editor-bg: #0a0f0a;
+  --editor-text: #00ff66;
+  --selection-bg: #005522;
+  --selection-text: #00ff66;
+  --active-item-bg: #004418;
+  --active-item-text: #00ff66;
+  --scanlines-display: block;
+}
+
+[data-theme="minimal-white"] {
+  --bg-color: #f8f9fa;
+  --panel-bg: #ffffff;
+  --header-bg: #e9ecef;
+  --header-text: #212529;
+  --text-main: #212529;
+  --text-muted: #6c757d;
+  --border-light: #e9ecef;
+  --border-dark: #dee2e6;
+  --border-darkest: #adb5bd;
+  --editor-bg: #ffffff;
+  --editor-text: #212529;
+  --selection-bg: #e2e8f0;
+  --selection-text: #0f172a;
+  --active-item-bg: #e2e8f0;
+  --active-item-text: #0f172a;
+  --scanlines-display: none;
+}

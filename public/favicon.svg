@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Folded Page Background -->
+  <path d="M 20,16 L 62,16 L 80,34 L 80,84 L 20,84 Z" fill="#FAF9F6" stroke="#1E293B" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- Folded Corner Triangle -->
+  <path d="M 62,16 L 62,34 L 80,34 Z" fill="#E2E8F0" stroke="#1E293B" stroke-width="4" stroke-linejoin="round"/>
+  <!-- Ruled Note Lines -->
+  <line x1="32" y1="42" x2="68" y2="42" stroke="#94A3B8" stroke-width="3" stroke-linecap="round"/>
+  <line x1="32" y1="53" x2="68" y2="53" stroke="#94A3B8" stroke-width="3" stroke-linecap="round"/>
+  <line x1="32" y1="64" x2="68" y2="64" stroke="#94A3B8" stroke-width="3" stroke-linecap="round"/>
+  <!-- Blue Retro Pixel Cursor -->
+  <rect x="32" y="73" width="16" height="5" fill="#2563EB" rx="1"/>
+</svg>

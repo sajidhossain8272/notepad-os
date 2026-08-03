@@ -1,10 +1,12 @@
 import { Note } from '../types';
 import { parseMarkdownToHtml } from './markdown';
 
+import { isTauriEnv } from './storage';
+
 /**
  * Downloads content as a file with specified extension.
  */
-export function exportNote(note: Note, format: 'md' | 'txt' | 'html'): void {
+export async function exportNote(note: Note, format: 'md' | 'txt' | 'html'): Promise<void> {
   let content = note.content;
   let mimeType = 'text/markdown';
   let extension = format;
@@ -41,6 +43,30 @@ export function exportNote(note: Note, format: 'md' | 'txt' | 'html'): void {
     name.replace(/[^a-z0-9_\-\s]/gi, '_').trim() || 'note';
 
   const filename = `${sanitizeFilename(note.title)}.${extension}`;
+
+  if (isTauriEnv()) {
+    try {
+      const { save } = await import('@tauri-apps/plugin-dialog');
+      const { writeTextFile } = await import('@tauri-apps/plugin-fs');
+
+      const filterName = format === 'md' ? 'Markdown Document' : format === 'txt' ? 'Text Document' : 'HTML Document';
+      const filePath = await save({
+        defaultPath: filename,
+        filters: [{
+          name: filterName,
+          extensions: [extension]
+        }]
+      });
+
+      if (filePath) {
+        await writeTextFile(filePath, content);
+      }
+      return;
+    } catch (err) {
+      console.warn('Tauri native save dialog failed, using fallback:', err);
+    }
+  }
+
   const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

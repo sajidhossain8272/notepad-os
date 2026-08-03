@@ -20,6 +20,7 @@ interface NotesState {
   togglePinNote: (id: string) => void;
   getActiveNote: () => Note | null;
   getFilteredNotes: () => Note[];
+  saveActiveNoteNow: () => Promise<void>;
 }
 
 export const useNotesStore = create<NotesState>((set, get) => ({
@@ -174,5 +175,12 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     return notes
       .filter((n) => n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q))
       .sort((a, b) => b.updatedAt - a.updatedAt);
+  },
+
+  saveActiveNoteNow: async () => {
+    const { notes } = get();
+    set({ isSaving: true });
+    await saveNotesToStorage(notes);
+    set({ isSaving: false, lastSavedAt: Date.now() });
   },
 }));

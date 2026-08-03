@@ -32,9 +32,9 @@ export const MenuBar: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleExport = (format: 'md' | 'txt' | 'html') => {
+  const handleExport = async (format: 'md' | 'txt' | 'html') => {
     if (activeNote) {
-      exportNote(activeNote, format);
+      await exportNote(activeNote, format);
     } else {
       alert('No active note to export!');
     }
@@ -79,6 +79,19 @@ export const MenuBar: React.FC = () => {
               >
                 <span>New Note</span>
                 <span className="opacity-60 text-[10px]">Ctrl+N</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  if (activeNote) {
+                    useNotesStore.getState().saveActiveNoteNow();
+                  }
+                  setActiveMenu(null);
+                }}
+                className="w-full text-left px-3 py-1 hover:bg-[var(--active-item-bg)] hover:text-[var(--active-item-text)] flex justify-between"
+              >
+                <span>Save Note</span>
+                <span className="opacity-60 text-[10px]">Ctrl+S</span>
               </button>
 
               <hr className="my-1 border-t border-[var(--border-dark)]" />

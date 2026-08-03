@@ -1,7 +1,7 @@
 {
   "name": "notepad-os",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,6 +15,7 @@
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.36.3",
     "@tauri-apps/api": "~2.0.0",
+    "@tauri-apps/plugin-dialog": "~2.0.0",
     "@tauri-apps/plugin-fs": "~2.0.0",
     "@tauri-apps/plugin-updater": "~2.0.0",
     "@uiw/react-codemirror": "^4.23.10",

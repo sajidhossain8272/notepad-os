@@ -11,6 +11,7 @@ import { WhatsNewModal } from './components/WhatsNewModal';
 import { useNotesStore } from './store/useNotesStore';
 import { useSettingsStore } from './store/useSettingsStore';
 import { useUpdateStore } from './store/useUpdateStore';
+import { saveNotesToStorage, saveSettingsToStorage, isTauriEnv } from './utils/storage';
 
 export const App: React.FC = () => {
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
@@ -26,6 +27,38 @@ export const App: React.FC = () => {
     initUpdateCheck();
   }, [initNotes, initSettings, initUpdateCheck]);
 
+  // Auto-save on window close / exit (Taskbar close or Close button)
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const { notes } = useNotesStore.getState();
+      const { settings } = useSettingsStore.getState();
+      saveNotesToStorage(notes);
+      saveSettingsToStorage(settings);
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    let unlisten: (() => void) | undefined;
+    if (isTauriEnv()) {
+      import('@tauri-apps/api/window').then(({ getCurrentWindow }) => {
+        const appWindow = getCurrentWindow();
+        appWindow.onCloseRequested(async () => {
+          const { notes } = useNotesStore.getState();
+          const { settings } = useSettingsStore.getState();
+          await saveNotesToStorage(notes);
+          await saveSettingsToStorage(settings);
+        }).then((fn) => {
+          unlisten = fn;
+        });
+      });
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (unlisten) unlisten();
+    };
+  }, []);
+
   // Global Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -33,6 +66,11 @@ export const App: React.FC = () => {
       if (e.ctrlKey && e.key.toLowerCase() === 'n') {
         e.preventDefault();
         createNote();
+      }
+      // Ctrl + S: Save Note
+      else if (e.ctrlKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        useNotesStore.getState().saveActiveNoteNow();
       }
       // Ctrl + P: Toggle Preview
       else if (e.ctrlKey && e.key.toLowerCase() === 'p') {

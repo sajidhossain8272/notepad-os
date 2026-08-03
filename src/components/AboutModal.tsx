@@ -32,7 +32,7 @@ export const AboutModal: React.FC = () => {
             <div className="space-y-1">
               <h2 className="text-base font-bold">Notepad OS</h2>
               <p className="text-[11px] font-semibold text-blue-700 dark:text-blue-400 font-mono">
-                Version 0.1.0 (Notes Module)
+                Version 0.1.1 (Notes Module)
               </p>
               <p className="text-[11px] opacity-90 italic">"A private offline workspace for your notes."</p>
             </div>

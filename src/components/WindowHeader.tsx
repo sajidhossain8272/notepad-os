@@ -8,25 +8,37 @@ export const WindowHeader: React.FC = () => {
 
   const handleMinimize = async () => {
     if (isTauriEnv()) {
-      const { Window } = await import('@tauri-apps/api/window');
-      const appWindow = Window.getCurrent();
-      await appWindow.minimize();
+      try {
+        const { getCurrentWindow } = await import('@tauri-apps/api/window');
+        const appWindow = getCurrentWindow();
+        await appWindow.minimize();
+      } catch (err) {
+        console.error('Failed to minimize window:', err);
+      }
     }
   };
 
   const handleMaximize = async () => {
     if (isTauriEnv()) {
-      const { Window } = await import('@tauri-apps/api/window');
-      const appWindow = Window.getCurrent();
-      await appWindow.toggleMaximize();
+      try {
+        const { getCurrentWindow } = await import('@tauri-apps/api/window');
+        const appWindow = getCurrentWindow();
+        await appWindow.toggleMaximize();
+      } catch (err) {
+        console.error('Failed to maximize window:', err);
+      }
     }
   };
 
   const handleClose = async () => {
     if (isTauriEnv()) {
-      const { Window } = await import('@tauri-apps/api/window');
-      const appWindow = Window.getCurrent();
-      await appWindow.close();
+      try {
+        const { getCurrentWindow } = await import('@tauri-apps/api/window');
+        const appWindow = getCurrentWindow();
+        await appWindow.close();
+      } catch (err) {
+        console.error('Failed to close window:', err);
+      }
     }
   };
 
@@ -42,7 +54,7 @@ export const WindowHeader: React.FC = () => {
         <span className="text-[10px] opacity-75 font-normal ml-1 hidden sm:inline">
           — A private offline workspace for your notes
         </span>
-        <span className="text-[10px] opacity-75 font-normal ml-0.5">v0.1.0</span>
+        <span className="text-[10px] opacity-75 font-normal ml-0.5">v0.1.1</span>
       </div>
 
       {/* Window Controls */}

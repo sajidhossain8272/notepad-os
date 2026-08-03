@@ -11,7 +11,7 @@ interface StatusBarProps {
 
 export const StatusBar: React.FC<StatusBarProps> = ({ cursorLine, cursorCol }) => {
   const { getActiveNote, isSaving, lastSavedAt } = useNotesStore();
-  const { settings, openSettings, togglePreview } = useSettingsStore();
+  const { settings, openSettings, togglePreview, toggleAutoSave } = useSettingsStore();
 
   const activeNote = getActiveNote();
   const stats = calculateStats(activeNote?.content || '', cursorLine, cursorCol);
@@ -35,6 +35,17 @@ export const StatusBar: React.FC<StatusBarProps> = ({ cursorLine, cursorCol }) =
 
       {/* RIGHT STATUS & ACTIONS */}
       <div className="flex items-center gap-2">
+        {/* AutoSave Toggle Indicator */}
+        <button
+          onClick={toggleAutoSave}
+          title={settings.autoSave ? 'Auto-Save Enabled (Click to toggle)' : 'Auto-Save Disabled (Click to toggle)'}
+          className={`win95-outset px-1.5 py-0.5 flex items-center gap-1 hover:bg-gray-200 active:win95-pressed ${
+            settings.autoSave ? 'bg-green-100 font-bold' : 'opacity-60'
+          }`}
+        >
+          <span className="text-[10px]">AutoSave: {settings.autoSave ? 'ON' : 'OFF'}</span>
+        </button>
+
         {/* Saved Status Indicator */}
         <div className="win95-inset px-2 py-0.5 flex items-center gap-1 min-w-[90px] justify-center">
           {isSaving ? (

@@ -13,7 +13,7 @@ export const WhatsNewModal: React.FC = () => {
       <div className="w-full max-w-md bg-[var(--panel-bg)] win95-outset p-1 text-[var(--text-main)] shadow-2xl">
         {/* TITLE BAR */}
         <div className="bg-[var(--header-bg)] text-[var(--header-text)] px-2 py-1 flex items-center justify-between font-bold text-xs">
-          <span>Welcome to Notepad OS v{whatsNewVersion || '0.1.0'}</span>
+          <span>Welcome to Notepad OS v{whatsNewVersion || '0.1.1'}</span>
           <button
             onClick={closeWhatsNewModal}
             className="w-4 h-4 bg-win95-bg hover:bg-red-600 hover:text-white text-black font-bold text-[10px] flex items-center justify-center border border-t-white border-l-white border-r-gray-800 border-b-gray-800"
@@ -28,7 +28,7 @@ export const WhatsNewModal: React.FC = () => {
             <BrandIcon className="w-10 h-10 flex-shrink-0" />
             <div>
               <h3 className="font-bold text-sm">
-                Successfully Loaded Notepad OS v{whatsNewVersion || '0.1.0'}!
+                Successfully Loaded Notepad OS v{whatsNewVersion || '0.1.1'}!
               </h3>
               <p className="text-[11px] text-green-700 dark:text-green-400 font-semibold mt-0.5">
                 ✓ Your notes, themes, and settings have been 100% preserved.

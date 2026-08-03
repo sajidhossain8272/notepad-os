@@ -208,11 +208,26 @@ export async function loadNotesFromStorage(): Promise<Note[]> {
   return INITIAL_NOTES;
 }
 
+export async function ensureAppDirExists(): Promise<void> {
+  if (isTauriEnv()) {
+    try {
+      const { mkdir, exists, BaseDirectory } = await import('@tauri-apps/plugin-fs');
+      const dirExists = await exists('', { baseDir: BaseDirectory.AppLocalData });
+      if (!dirExists) {
+        await mkdir('', { baseDir: BaseDirectory.AppLocalData, recursive: true });
+      }
+    } catch (err) {
+      console.warn('[Storage] ensureAppDirExists:', err);
+    }
+  }
+}
+
 /**
  * Saves notes array to NotepadOS storage.
  */
 export async function saveNotesToStorage(notes: Note[]): Promise<void> {
   try {
+    await ensureAppDirExists();
     if (isTauriEnv()) {
       const { writeTextFile, BaseDirectory } = await import('@tauri-apps/plugin-fs');
       await writeTextFile('notes.json', JSON.stringify(notes, null, 2), {
@@ -255,6 +270,7 @@ export async function loadSettingsFromStorage(): Promise<AppSettings> {
  */
 export async function saveSettingsToStorage(settings: AppSettings): Promise<void> {
   try {
+    await ensureAppDirExists();
     if (isTauriEnv()) {
       const { writeTextFile, BaseDirectory } = await import('@tauri-apps/plugin-fs');
       await writeTextFile('settings.json', JSON.stringify(settings, null, 2), {

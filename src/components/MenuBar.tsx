@@ -18,6 +18,8 @@ export const MenuBar: React.FC = () => {
     cycleTheme,
     isSidebarOpen,
     settings,
+    activeView,
+    setActiveView,
   } = useSettingsStore();
 
   const activeNote = getActiveNote();
@@ -183,10 +185,34 @@ export const MenuBar: React.FC = () => {
             <div className="absolute left-0 top-full mt-0.5 w-52 bg-[var(--panel-bg)] win95-outset py-1 z-50 text-xs shadow-lg">
               <button
                 onClick={() => {
-                  toggleSidebar();
+                  setActiveView('notes');
                   setActiveMenu(null);
                 }}
                 className="w-full text-left px-3 py-1 hover:bg-[var(--active-item-bg)] hover:text-[var(--active-item-text)] flex justify-between items-center"
+              >
+                <span>{activeView === 'notes' ? '✓ Notes' : 'Notes'}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveView('activity');
+                  setActiveMenu(null);
+                }}
+                className="w-full text-left px-3 py-1 hover:bg-[var(--active-item-bg)] hover:text-[var(--active-item-text)] flex justify-between items-center"
+              >
+                <span>{activeView === 'activity' ? '✓ Fiverr Activity' : 'Fiverr Activity'}</span>
+                <span className="opacity-60 text-[10px]">Ctrl+Shift+A</span>
+              </button>
+
+              <hr className="my-1 border-t border-[var(--border-dark)]" />
+
+              <button
+                onClick={() => {
+                  toggleSidebar();
+                  setActiveMenu(null);
+                }}
+                disabled={activeView !== 'notes'}
+                className="w-full text-left px-3 py-1 hover:bg-[var(--active-item-bg)] hover:text-[var(--active-item-text)] flex justify-between items-center disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[var(--text-main)]"
               >
                 <span>{isSidebarOpen ? '✓ Hide Sidebar' : 'Show Sidebar'}</span>
               </button>
@@ -196,13 +222,15 @@ export const MenuBar: React.FC = () => {
                   togglePreview();
                   setActiveMenu(null);
                 }}
-                className="w-full text-left px-3 py-1 hover:bg-[var(--active-item-bg)] hover:text-[var(--active-item-text)] flex justify-between items-center"
+                disabled={activeView !== 'notes'}
+                className="w-full text-left px-3 py-1 hover:bg-[var(--active-item-bg)] hover:text-[var(--active-item-text)] flex justify-between items-center disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[var(--text-main)]"
               >
                 <span>{settings.showPreview ? '✓ Live Preview' : 'Show Live Preview'}</span>
                 <span className="opacity-60 text-[10px]">Ctrl+P</span>
               </button>
 
               <hr className="my-1 border-t border-[var(--border-dark)]" />
+
 
               <button
                 onClick={() => {

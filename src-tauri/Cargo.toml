@@ -1,6 +1,6 @@
 [package]
 name = "notepad-os"
-version = "0.1.1"
+version = "0.2.0"
 description = "A private offline workspace for your notes. Part of the Notepad OS local productivity environment."
 authors = ["Notepad OS Developers"]
 edition = "2021"

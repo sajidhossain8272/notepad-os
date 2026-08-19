@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2.0.0",
   "productName": "Notepad OS",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "identifier": "com.notepados.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -12,12 +12,16 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "Notepad OS",
         "width": 1024,
         "height": 680,
         "minWidth": 640,
         "minHeight": 480,
         "resizable": true,
+        "maximizable": true,
+        "minimizable": true,
+        "closable": true,
         "decorations": false,
         "transparent": false,
         "center": true

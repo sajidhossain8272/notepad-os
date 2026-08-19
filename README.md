@@ -4,14 +4,17 @@ A privacy-first local productivity environment starting with a lightweight markd
 
 ---
 
-## ⚠️ Known Issues (v0.1.1)
+## ⚠️ Known Issues (v0.2.0)
 
-> These are actively tracked bugs. See [ISSUES.md](ISSUES.md) for full details and workarounds.
+> See [ISSUES.md](ISSUES.md) for full details.
 
-| # | Issue | Severity | Workaround |
-|---|-------|----------|------------|
-| [#1](ISSUES.md#issue-1--window-controls-not-working) | Window minimize / maximize / close buttons do nothing | 🔴 High | `Alt+F4` to close, `Win+↓` to minimize |
-| [#2](ISSUES.md#issue-2--titlebar-drag-does-not-move-the-window) | Titlebar drag does not move the window | 🔴 High | `Win+←/→` to snap, or use taskbar |
+| # | Issue | Severity | Status |
+|---|-------|----------|--------|
+| [#1](ISSUES.md#issue-1--window-controls-not-working) | Window minimize / maximize / close buttons do nothing | 🔴 High | ✅ Fixed in v0.2.0 |
+| [#2](ISSUES.md#issue-2--titlebar-drag-does-not-move-the-window) | Titlebar drag does not move the window | 🔴 High | ✅ Fixed in v0.2.0 |
+| [#3](ISSUES.md#issue-3--smart-app-control-warning-on-install) | SmartScreen warning on install (app is not code-signed) | 🟡 Low | Expected — click **More info → Run anyway** |
+
+Both window bugs were caused by a single defect: a CommonJS `require()` call inside an ES module bundle threw on every invocation, and an empty `catch {}` swallowed the error so all window operations silently did nothing. [Full write-up →](ISSUES.md)
 
 ---
 
@@ -27,6 +30,7 @@ Notepad OS keeps your information local and under your control. Zero cloud depen
 
 - **Offline-first**: Works 100% offline with no external server dependencies.
 - **Markdown editor**: Live side-by-side rendering using CodeMirror 6 text engine.
+- **Fiverr Activity**: A private, offline time tracker for your own freelance work — workspaces, projects, start/pause/resume/stop sessions, session notes, daily & weekly summaries, and CSV/JSON export. Open it with **View → Fiverr Activity** or `Ctrl+Shift+A`.
 - **Local storage**: Notes and settings saved locally in your OS Application Data directory (`NotepadOS/`).
 - **Auto-save**: Notes are saved automatically as you type and on window close.
 - **Export**: Export notes as `.md`, `.txt`, or `.html` via native OS save dialog.
@@ -39,7 +43,21 @@ Notepad OS keeps your information local and under your control. Zero cloud depen
 
 ---
 
+## About Fiverr Activity
+
+Fiverr Activity is a **personal, local work log**. You press start and stop; it records the timestamps.
+
+- It is **100% local** and has no network access whatsoever.
+- It **never connects to Fiverr**, does not log into your account, and does not read anything from Fiverr.
+- It **does not automate, spoof, or modify** your Fiverr activity, availability, or online status.
+- Elapsed time is derived from stored wall-clock timestamps rather than a running counter, so totals stay accurate when the window is minimized, the machine sleeps, or the app is closed and reopened.
+
+See [docs/DATA_STORAGE.md](docs/DATA_STORAGE.md) for the exact on-disk schema.
+
+---
+
 ## Screenshots
+
 
 ![Notepad OS Main Application](screenshots/app-main.png)
 *Notepad OS Notes Module (Windows 95 Theme)*
@@ -105,18 +123,20 @@ Production installers will be generated in `src-tauri/target/release/bundle/`.
 
 ## Roadmap
 
-### v0.1.1 (Current — Bug Fix Release)
+### v0.2.0 (Current)
+- Fixed window minimize / maximize / restore / close
+- Fixed titlebar drag-to-move
+- Added window edge & corner resizing
+- Added Fiverr Activity — offline work/time tracking with daily & weekly summaries and CSV/JSON export
+
+### v0.1.1
 - Auto-save on exit
 - Theme persistence across restarts
 - Export as .md / .txt / .html
 - Auto-update from v0.1.0
 
-### v0.1.2 (Planned)
-- Fix window minimize / maximize / close controls
-- Fix titlebar drag-to-move
+### v0.2.1 (Planned)
 - Code signing (removes SmartScreen warning)
-
-### v0.2.0
 - Better search & tag filtering
 - Advanced editor customization
 
@@ -125,6 +145,7 @@ Production installers will be generated in `src-tauri/target/release/bundle/`.
 
 ### v1.0.0
 - Full local plugin ecosystem
+
 
 ---
 

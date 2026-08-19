@@ -35,9 +35,17 @@ export async function checkAndRunMigrations(): Promise<MigrationCheckResult> {
     // 2. Data Migration Execution (if data schema version increased)
     if (previousDataVersion < currentTargetDataVersion) {
       console.log(`[Migration] Migrating data from v${previousDataVersion} to v${currentTargetDataVersion}...`);
+
+      // v1 -> v2 (Fiverr Activity): purely ADDITIVE. It introduces a brand new
+      // `activity.json` store and does not touch notes or settings, so there is
+      // nothing to transform. `loadActivityFromStorage()` already returns
+      // EMPTY_ACTIVITY_DATA when the file is absent, and normalizes any partial
+      // payload it does find. The backup in step 1 still runs as a safety net.
+
       // Future version migration hooks can be added here
       dataMigrated = true;
     }
+
 
     // 3. Update metadata to record current app version & date
     if (isUpdated || previousDataVersion < currentTargetDataVersion) {

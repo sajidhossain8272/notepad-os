@@ -1,14 +1,23 @@
-import { Note, AppSettings, AppMetadata } from '../types';
+import { Note, AppSettings, AppMetadata, ActivityData } from '../types';
 import versionConfig from '../../version.json';
 
 const STORAGE_NOTES_KEY = 'notepados_notes_v1';
 const STORAGE_SETTINGS_KEY = 'notepados_settings_v1';
 const STORAGE_METADATA_KEY = 'notepados_metadata_v1';
 const STORAGE_BACKUPS_KEY = 'notepados_backups_v1';
+const STORAGE_ACTIVITY_KEY = 'notepados_activity_v1';
 
 // Legacy keys for migration detection
 const LEGACY_NOTES_KEY = 'nostalgia_notepad_notes_v1';
 const LEGACY_SETTINGS_KEY = 'nostalgia_notepad_settings_v1';
+
+export const EMPTY_ACTIVITY_DATA: ActivityData = {
+  version: 1,
+  workspaces: [],
+  projects: [],
+  sessions: [],
+  activeSessionId: null,
+};
 
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'windows-95',
@@ -280,5 +289,62 @@ export async function saveSettingsToStorage(settings: AppSettings): Promise<void
     localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(settings));
   } catch (err) {
     console.error('Failed to save settings:', err);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* FIVERR ACTIVITY (activity.json)                                            */
+/*                                                                            */
+/* Same dual-write strategy as notes/settings: the AppLocalData JSON file is   */
+/* the durable store, with a localStorage mirror for browser dev mode and as a */
+/* fallback if the filesystem read ever fails. Fully local — no network.       */
+/* -------------------------------------------------------------------------- */
+
+/** Normalizes unknown/partial JSON into a valid ActivityData shape. */
+function normalizeActivityData(raw: unknown): ActivityData {
+  if (!raw || typeof raw !== 'object') return { ...EMPTY_ACTIVITY_DATA };
+
+  const data = raw as Partial<ActivityData>;
+  return {
+    version: typeof data.version === 'number' ? data.version : 1,
+    workspaces: Array.isArray(data.workspaces) ? data.workspaces : [],
+    projects: Array.isArray(data.projects) ? data.projects : [],
+    sessions: Array.isArray(data.sessions) ? data.sessions : [],
+    activeSessionId: typeof data.activeSessionId === 'string' ? data.activeSessionId : null,
+  };
+}
+
+export async function loadActivityFromStorage(): Promise<ActivityData> {
+  try {
+    if (isTauriEnv()) {
+      const { readTextFile, exists, BaseDirectory } = await import('@tauri-apps/plugin-fs');
+      const hasActivity = await exists('activity.json', { baseDir: BaseDirectory.AppLocalData });
+      if (hasActivity) {
+        const data = await readTextFile('activity.json', { baseDir: BaseDirectory.AppLocalData });
+        return normalizeActivityData(JSON.parse(data));
+      }
+    }
+
+    const raw = localStorage.getItem(STORAGE_ACTIVITY_KEY);
+    if (raw) return normalizeActivityData(JSON.parse(raw));
+  } catch (err) {
+    console.warn('Failed to load activity data, starting empty:', err);
+  }
+
+  return { ...EMPTY_ACTIVITY_DATA };
+}
+
+export async function saveActivityToStorage(data: ActivityData): Promise<void> {
+  try {
+    await ensureAppDirExists();
+    if (isTauriEnv()) {
+      const { writeTextFile, BaseDirectory } = await import('@tauri-apps/plugin-fs');
+      await writeTextFile('activity.json', JSON.stringify(data, null, 2), {
+        baseDir: BaseDirectory.AppLocalData,
+      });
+    }
+    localStorage.setItem(STORAGE_ACTIVITY_KEY, JSON.stringify(data));
+  } catch (err) {
+    console.error('Failed to save activity data:', err);
   }
 }

@@ -8,24 +8,31 @@ import { SettingsModal } from './components/SettingsModal';
 import { AboutModal } from './components/AboutModal';
 import { UpdateModal } from './components/UpdateModal';
 import { WhatsNewModal } from './components/WhatsNewModal';
+import { ActivityPanel } from './components/ActivityPanel';
+import { WindowResizeHandles } from './components/WindowResizeHandles';
 import { useNotesStore } from './store/useNotesStore';
 import { useSettingsStore } from './store/useSettingsStore';
 import { useUpdateStore } from './store/useUpdateStore';
-import { saveNotesToStorage, saveSettingsToStorage, isTauriEnv } from './utils/storage';
+import { useActivityStore } from './store/useActivityStore';
+import { saveNotesToStorage, saveSettingsToStorage } from './utils/storage';
+import { onWindowCloseRequested } from './utils/tauriWindow';
 
 export const App: React.FC = () => {
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
 
   const { initNotes, createNote, getActiveNote, updateActiveNoteContent } = useNotesStore();
-  const { initSettings, cycleTheme, togglePreview } = useSettingsStore();
+  const { initSettings, cycleTheme, togglePreview, activeView, toggleActiveView } = useSettingsStore();
   const { initUpdateCheck } = useUpdateStore();
+  const { initActivity } = useActivityStore();
 
   // Initialize stores & run update check on startup
   useEffect(() => {
     initSettings();
     initNotes();
+    initActivity();
     initUpdateCheck();
-  }, [initNotes, initSettings, initUpdateCheck]);
+  }, [initNotes, initSettings, initActivity, initUpdateCheck]);
+
 
   // Auto-save on window close / exit (Taskbar close or Close button)
   useEffect(() => {
@@ -39,25 +46,25 @@ export const App: React.FC = () => {
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     let unlisten: (() => void) | undefined;
-    if (isTauriEnv()) {
-      import('@tauri-apps/api/window').then(({ getCurrentWindow }) => {
-        const appWindow = getCurrentWindow();
-        appWindow.onCloseRequested(async () => {
-          const { notes } = useNotesStore.getState();
-          const { settings } = useSettingsStore.getState();
-          await saveNotesToStorage(notes);
-          await saveSettingsToStorage(settings);
-        }).then((fn) => {
-          unlisten = fn;
-        });
-      });
-    }
+    let cancelled = false;
+
+    onWindowCloseRequested(async () => {
+      const { notes } = useNotesStore.getState();
+      const { settings } = useSettingsStore.getState();
+      await saveNotesToStorage(notes);
+      await saveSettingsToStorage(settings);
+    }).then((fn) => {
+      if (cancelled) fn();
+      else unlisten = fn;
+    });
 
     return () => {
+      cancelled = true;
       window.removeEventListener('beforeunload', handleBeforeUnload);
       if (unlisten) unlisten();
     };
   }, []);
+
 
   // Global Keyboard Shortcuts
   useEffect(() => {
@@ -82,6 +89,12 @@ export const App: React.FC = () => {
         e.preventDefault();
         cycleTheme();
       }
+      // Ctrl + Shift + A: Toggle Notes / Fiverr Activity view
+      else if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        toggleActiveView();
+      }
+
       // F5: Insert Timestamp
       else if (e.key === 'F5') {
         e.preventDefault();
@@ -95,7 +108,7 @@ export const App: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [createNote, cycleTheme, getActiveNote, togglePreview, updateActiveNoteContent]);
+  }, [createNote, cycleTheme, getActiveNote, togglePreview, toggleActiveView, updateActiveNoteContent]);
 
   return (
     <div className="w-screen h-screen flex flex-col bg-[var(--bg-color)] overflow-hidden font-win95 relative">
@@ -110,21 +123,31 @@ export const App: React.FC = () => {
         {/* TOP MENUBAR */}
         <MenuBar />
 
-        {/* MAIN BODY: SIDEBAR + EDITOR */}
+        {/* MAIN BODY: NOTES (SIDEBAR + EDITOR) OR FIVERR ACTIVITY */}
         <div className="flex-1 flex overflow-hidden border-t border-b border-[var(--border-dark)] relative">
-          <Sidebar />
-          <Editor onCursorChange={(line, col) => setCursorPos({ line, col })} />
+          {activeView === 'activity' ? (
+            <ActivityPanel />
+          ) : (
+            <>
+              <Sidebar />
+              <Editor onCursorChange={(line, col) => setCursorPos({ line, col })} />
+            </>
+          )}
         </div>
 
         {/* BOTTOM STATUSBAR */}
         <StatusBar cursorLine={cursorPos.line} cursorCol={cursorPos.col} />
       </div>
 
+      {/* CUSTOM WINDOW RESIZE GRIPS (decorations are disabled, so we provide our own) */}
+      <WindowResizeHandles />
+
       {/* MODAL DIALOGS */}
       <SettingsModal />
       <AboutModal />
       <UpdateModal />
       <WhatsNewModal />
+
     </div>
   );
 };

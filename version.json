@@ -1,8 +1,8 @@
 {
-  "version": "0.1.1",
-  "dataVersion": 1,
+  "version": "0.2.0",
+  "dataVersion": 2,
   "dataMigrationVersion": 1,
   "app": "Notepad OS",
   "subtitle": "A private offline workspace for your notes.",
-  "releaseNotes": "v0.1.1 Patch: Fix window header controls (minimize/maximize/close), auto-save on window exit/taskbar close, auto-save preference toggle, theme preference persistence, and native file export (.md, .txt, .html)."
+  "releaseNotes": "v0.2.0: Fixed the custom window for real — dragging the titlebar, minimize, maximize/restore, close and edge/corner resizing all work now. The root cause was a CommonJS `require()` call inside an ES module bundle that threw and was silently swallowed, plus missing Tauri v2 window permissions. Also new: Fiverr Activity, a fully offline work-tracker with workspaces, projects, start/pause/resume/stop sessions, session notes, daily & weekly summaries and CSV/JSON export. It never connects to Fiverr and never touches your Fiverr account or online status."
 }

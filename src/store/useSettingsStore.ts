@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { AppSettings, ThemeMode, FontFamily } from '../types';
+import { AppSettings, ThemeMode, FontFamily, AppView } from '../types';
 import { loadSettingsFromStorage, saveSettingsToStorage, DEFAULT_SETTINGS } from '../utils/storage';
 
 interface SettingsState {
@@ -7,9 +7,13 @@ interface SettingsState {
   isSettingsOpen: boolean;
   isAboutOpen: boolean;
   isSidebarOpen: boolean;
+  activeView: AppView;
 
   // Actions
   initSettings: () => Promise<void>;
+  setActiveView: (view: AppView) => void;
+  toggleActiveView: () => void;
+
   setTheme: (theme: ThemeMode) => void;
   setFontSize: (size: number) => void;
   setFontFamily: (family: FontFamily) => void;
@@ -31,6 +35,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   isSettingsOpen: false,
   isAboutOpen: false,
   isSidebarOpen: true,
+  activeView: 'notes',
 
   initSettings: async () => {
     const loadedSettings = await loadSettingsFromStorage();
@@ -38,6 +43,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     // Apply data-theme attribute to document root
     document.documentElement.setAttribute('data-theme', loadedSettings.theme);
   },
+
+  setActiveView: (activeView: AppView) => set({ activeView }),
+
+  toggleActiveView: () =>
+    set((state) => ({ activeView: state.activeView === 'notes' ? 'activity' : 'notes' })),
+
 
   setTheme: (theme: ThemeMode) => {
     const { settings } = get();

@@ -2,6 +2,25 @@
 
 All notable changes to **Notepad OS** will be documented in this file.
 
+## 0.4.0 (2026-10-06)
+
+### Fixed — HTML Preview Renders Full Pages (HTML5 / CSS3 / JavaScript)
+
+Pages built with JavaScript (scroll-reveal animations, dynamic content, mobile menus) previously appeared **mostly blank** in the HTML preview because the iframe sandbox blocked all scripts — elements with `opacity: 0` reveal classes never became visible.
+
+- **Scripts now run in the preview.** The sandbox uses `allow-scripts`, so modern HTML5, CSS3 and JavaScript (ES6+) execute in the preview just like opening the file in a browser. The preview still runs as a **unique opaque origin**: page code cannot reach the app window, the app's data, cookies, or storage — it stays fully isolated.
+- **External links work.** `allow-popups` + `allow-popups-to-escape-sandbox` let `target="_blank"` links open outside the app, while the app window itself can never be navigated away by preview content (`allow-top-navigation` remains off). `referrerPolicy="no-referrer"` hides the app from any outbound requests.
+- **No reload thrash.** The preview document only rebuilds after you pause typing (500 ms debounce) instead of on every keystroke of a 3,000-line file.
+- **Scroll position survives edits.** A tiny bridge script (preview-only, never exported) stores the scroll offset in `window.name` and restores it after each preview reload.
+
+### Added — Code Writing Assist
+
+- **VS Code-style autocomplete in HTML notes**: tag names, attribute names and values, CSS properties inside `<style>`, and JavaScript keywords inside `<script>` (powered by `@codemirror/lang-html` + `lang-css` + `lang-javascript`).
+- Completion keymap enabled (`Ctrl+Space` to trigger, arrow keys + `Enter`/`Tab` to accept); bracket/quote auto-closing was already active.
+- Autocomplete only activates while the editor is in HTML mode, so prose writing stays distraction-free.
+
+---
+
 ## 0.3.0 (2026-10-06)
 
 ### Added — HTML Live Preview

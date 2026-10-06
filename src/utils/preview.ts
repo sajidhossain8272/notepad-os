@@ -71,3 +71,61 @@ ${content}
 </body>
 </html>`;
 }
+
+/**
+ * Script injected into the *preview only* (never into exports) that saves the
+ * scroll position in `window.name` (a browsing-context property, so it
+ * survives srcDoc reloads inside the sandbox) and restores it on load.
+ * Without this, every edit reload would jump the preview back to the top.
+ */
+const SCROLL_BRIDGE_SCRIPT = `<script>
+(function () {
+  try {
+    var KEY = "np-preview-scroll:";
+    var saved =
+      window.name.indexOf(KEY) === 0
+        ? parseInt(window.name.slice(KEY.length), 10) || 0
+        : 0;
+    var restore = function () {
+      if (saved) {
+        var y = saved;
+        saved = 0;
+        window.scrollTo(0, y);
+      }
+    };
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", restore);
+    } else {
+      restore();
+    }
+    var ticking = false;
+    window.addEventListener(
+      "scroll",
+      function () {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function () {
+          try {
+            window.name = KEY + String(Math.round(window.scrollY));
+          } catch (e) {}
+          ticking = false;
+        });
+      },
+      { passive: true }
+    );
+  } catch (e) {}
+})();
+<\/script>
+`;
+
+/**
+ * Appends the scroll-preservation bridge to a preview document.
+ * Used only for the live preview iframe, never for exported files.
+ */
+export function injectPreviewScrollBridge(srcDoc: string): string {
+  if (!srcDoc) return srcDoc;
+  if (/<\/body>/i.test(srcDoc)) {
+    return srcDoc.replace(/<\/body>/i, `${SCROLL_BRIDGE_SCRIPT}</body>`);
+  }
+  return srcDoc + SCROLL_BRIDGE_SCRIPT;
+}

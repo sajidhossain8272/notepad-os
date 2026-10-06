@@ -1,14 +1,33 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { html } from '@codemirror/lang-html';
 import { useNotesStore } from '../store/useNotesStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { parseMarkdownToHtml } from '../utils/markdown';
-import { resolvePreviewFormat, buildHtmlPreviewSrcDoc } from '../utils/preview';
+import {
+  resolvePreviewFormat,
+  buildHtmlPreviewSrcDoc,
+  injectPreviewScrollBridge,
+} from '../utils/preview';
 
 interface EditorProps {
   onCursorChange?: (line: number, col: number) => void;
+}
+
+/**
+ * Debounces rapid edits so the HTML preview iframe (and its scripts) only
+ * reloads after typing pauses, instead of on every keystroke.
+ */
+function useDebouncedValue<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debounced;
 }
 
 export const Editor: React.FC<EditorProps> = ({ onCursorChange }) => {
@@ -33,6 +52,13 @@ export const Editor: React.FC<EditorProps> = ({ onCursorChange }) => {
       background: styles.getPropertyValue('--editor-bg').trim(),
     };
   }, [settings.theme]);
+
+  const debouncedContent = useDebouncedValue(activeNote?.content ?? '', 500);
+
+  const htmlSrcDoc = useMemo(
+    () => injectPreviewScrollBridge(buildHtmlPreviewSrcDoc(debouncedContent, previewPalette)),
+    [debouncedContent, previewPalette]
+  );
 
   if (!activeNote) {
     return (
@@ -104,7 +130,7 @@ export const Editor: React.FC<EditorProps> = ({ onCursorChange }) => {
               syntaxHighlighting: true,
               bracketMatching: true,
               closeBrackets: true,
-              autocompletion: false,
+              autocompletion: previewFormat === 'html',
               rectangularSelection: true,
               crosshairCursor: false,
               highlightActiveLine: true,
@@ -114,7 +140,7 @@ export const Editor: React.FC<EditorProps> = ({ onCursorChange }) => {
               searchKeymap: true,
               historyKeymap: true,
               foldKeymap: false,
-              completionKeymap: false,
+              completionKeymap: previewFormat === 'html',
               lintKeymap: false,
             }}
             theme="none"
@@ -141,8 +167,9 @@ export const Editor: React.FC<EditorProps> = ({ onCursorChange }) => {
               activeNote.content.trim() ? (
                 <iframe
                   title="HTML Live Preview"
-                  sandbox=""
-                  srcDoc={buildHtmlPreviewSrcDoc(activeNote.content, previewPalette)}
+                  sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
+                  referrerPolicy="no-referrer"
+                  srcDoc={htmlSrcDoc}
                   style={{ backgroundColor: previewPalette.background }}
                   className="flex-1 min-h-0 w-full border-0"
                 />

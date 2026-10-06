@@ -1,8 +1,8 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "dataVersion": 2,
   "dataMigrationVersion": 1,
   "app": "Notepad OS",
   "subtitle": "A private offline workspace for your notes.",
-  "releaseNotes": "v0.3.0: HTML live preview — notes containing HTML (full documents or fragments) are now detected automatically and rendered side-by-side with markdown, isolated in a sandboxed preview iframe so scripts can't touch the app. A mode button in the preview header lets you pin Auto, Markdown, or HTML per note; the editor switches to HTML syntax highlighting for HTML notes, and exporting an HTML note as .html emits its rendered document."
+  "releaseNotes": "v0.4.0: HTML preview now runs full pages — JavaScript-powered sites (scroll reveals, dynamic content, menus) render completely instead of appearing blank, while staying isolated from the app in a sandboxed preview. Preview reloads are debounced while you type and scroll position is preserved across edits. New: VS Code-style code writing assist — autocomplete for HTML tags, attributes, CSS and JavaScript while editing HTML notes."
 }

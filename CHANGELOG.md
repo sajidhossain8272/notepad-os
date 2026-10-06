@@ -2,7 +2,7 @@
 
 All notable changes to **Notepad OS** will be documented in this file.
 
-## Unreleased
+## 0.3.0 (2026-10-06)
 
 ### Added — HTML Live Preview
 

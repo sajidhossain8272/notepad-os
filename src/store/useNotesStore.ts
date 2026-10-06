@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Note } from '../types';
+import { Note, NoteFormat } from '../types';
 import { loadNotesFromStorage, saveNotesToStorage } from '../utils/storage';
 
 interface NotesState {
@@ -18,6 +18,8 @@ interface NotesState {
   updateActiveNoteTitle: (title: string) => void;
   deleteNote: (id: string) => void;
   togglePinNote: (id: string) => void;
+  /** Cycles the active note's preview format: auto -> markdown -> html -> auto. */
+  cycleActiveNoteFormat: () => void;
   getActiveNote: () => Note | null;
   getFilteredNotes: () => Note[];
   saveActiveNoteNow: () => Promise<void>;
@@ -152,6 +154,22 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     });
 
     set({ notes: updatedNotes });
+    saveNotesToStorage(updatedNotes);
+  },
+
+  cycleActiveNoteFormat: () => {
+    const { notes, activeNoteId } = get();
+    if (!activeNoteId) return;
+
+    const updatedNotes = notes.map((n) => {
+      if (n.id !== activeNoteId) return n;
+      // undefined = auto-detect; explicit values pin the format.
+      const nextFormat: NoteFormat | undefined =
+        n.format === undefined ? 'markdown' : n.format === 'markdown' ? 'html' : undefined;
+      return { ...n, format: nextFormat };
+    });
+
+    set({ notes: updatedNotes, lastSavedAt: Date.now() });
     saveNotesToStorage(updatedNotes);
   },
 

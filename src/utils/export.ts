@@ -1,5 +1,6 @@
 import { Note } from '../types';
 import { parseMarkdownToHtml } from './markdown';
+import { resolvePreviewFormat, buildHtmlPreviewSrcDoc } from './preview';
 
 import { isTauriEnv } from './storage';
 
@@ -19,24 +20,12 @@ export async function exportNote(note: Note, format: 'md' | 'txt' | 'html'): Pro
       .replace(/[*_`]/g, '');
   } else if (format === 'html') {
     mimeType = 'text/html';
-    const bodyHtml = parseMarkdownToHtml(note.content);
-    content = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>${escapeHtml(note.title)}</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 2rem; max-width: 800px; margin: 0 auto; color: #333; }
-    code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
-    pre { background: #f4f4f4; padding: 1rem; border-radius: 6px; overflow-x: auto; }
-    blockquote { border-left: 4px solid #ccc; margin: 0; padding-left: 1rem; color: #666; }
-    hr { border: 0; border-top: 1px solid #ddd; margin: 2rem 0; }
-  </style>
-</head>
-<body>
-  ${bodyHtml}
-</body>
-</html>`;
+    // HTML-format notes export exactly what the preview renders; markdown
+    // notes are converted as before.
+    content =
+      resolvePreviewFormat(note) === 'html'
+        ? buildHtmlPreviewSrcDoc(note.content, { text: '#000000', background: '#ffffff' })
+        : buildHtmlDocument(escapeHtml(note.title), parseMarkdownToHtml(note.content));
   }
 
   const sanitizeFilename = (name: string) =>
@@ -76,6 +65,30 @@ export async function exportNote(note: Note, format: 'md' | 'txt' | 'html'): Pro
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+/**
+ * Wraps rendered note HTML in a standalone, styled document.
+ * `title` must already be HTML-escaped by the caller.
+ */
+function buildHtmlDocument(title: string, bodyHtml: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${title}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 2rem; max-width: 800px; margin: 0 auto; color: #333; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+    pre { background: #f4f4f4; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+    blockquote { border-left: 4px solid #ccc; margin: 0; padding-left: 1rem; color: #666; }
+    hr { border: 0; border-top: 1px solid #ddd; margin: 2rem 0; }
+  </style>
+</head>
+<body>
+  ${bodyHtml}
+</body>
+</html>`;
 }
 
 function escapeHtml(str: string): string {

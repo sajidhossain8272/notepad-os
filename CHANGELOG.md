@@ -2,6 +2,20 @@
 
 All notable changes to **Notepad OS** will be documented in this file.
 
+## Unreleased
+
+### Added — HTML Live Preview
+
+The preview pane now renders **HTML notes alongside Markdown** (`Ctrl+P` still toggles the pane itself).
+
+- **Auto-detection**: notes starting with `<!DOCTYPE html>` / `<html>` — or whose first line opens with an HTML tag — are previewed as HTML automatically.
+- **Per-note override**: the mode button in the preview header cycles **Auto → Markdown → HTML → Auto** and persists with the note (`format` field in `notes.json`).
+- **Isolated rendering**: HTML previews run inside a sandboxed `<iframe>` (no scripts, no same-origin access), so untrusted markup cannot touch the app. HTML fragments are wrapped in a shell tinted with the active theme's colors; full documents render untouched.
+- **Editor syntax**: the CodeMirror editor switches to HTML highlighting while an HTML note is active.
+- **Export**: exporting an HTML note as `.html` emits its rendered document instead of re-parsing it as Markdown.
+
+---
+
 ## 0.2.0 (2026-08-19)
 
 ### Fixed — Custom Window (actual root cause, finally)

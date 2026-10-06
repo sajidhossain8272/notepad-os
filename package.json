@@ -11,6 +11,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@codemirror/lang-html": "^6.4.11",
     "@codemirror/lang-markdown": "^6.2.5",
     "@codemirror/state": "^6.5.2",
     "@codemirror/theme-one-dark": "^6.1.2",

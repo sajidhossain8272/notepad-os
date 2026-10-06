@@ -2,6 +2,12 @@ export type ThemeMode = 'windows-95' | 'windows-xp' | 'terminal-green' | 'minima
 
 export type FontFamily = 'win95' | 'monospace' | 'terminal';
 
+/**
+ * Content format used by the live preview pane.
+ * `undefined` on a Note means "auto-detect" (see utils/preview.ts).
+ */
+export type NoteFormat = 'markdown' | 'html';
+
 export interface Note {
   id: string;
   title: string;
@@ -9,6 +15,8 @@ export interface Note {
   createdAt: number;
   updatedAt: number;
   pinned?: boolean;
+  /** Explicit preview format override; omitted = auto-detect. */
+  format?: NoteFormat;
 }
 
 export type AppView = 'notes' | 'activity';

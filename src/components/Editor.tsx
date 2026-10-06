@@ -1,25 +1,38 @@
 import React, { useMemo } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
+import { html } from '@codemirror/lang-html';
 import { useNotesStore } from '../store/useNotesStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { parseMarkdownToHtml } from '../utils/markdown';
+import { resolvePreviewFormat, buildHtmlPreviewSrcDoc } from '../utils/preview';
 
 interface EditorProps {
   onCursorChange?: (line: number, col: number) => void;
 }
 
 export const Editor: React.FC<EditorProps> = ({ onCursorChange }) => {
-  const { getActiveNote, updateActiveNoteContent, updateActiveNoteTitle } = useNotesStore();
+  const { getActiveNote, updateActiveNoteContent, updateActiveNoteTitle, cycleActiveNoteFormat } = useNotesStore();
   const { settings } = useSettingsStore();
 
   const activeNote = getActiveNote();
+  const previewFormat = activeNote ? resolvePreviewFormat(activeNote) : 'markdown';
 
   const extensions = useMemo(() => {
     return [
-      markdown({ base: markdownLanguage }),
+      previewFormat === 'html' ? html() : markdown({ base: markdownLanguage }),
     ];
-  }, []);
+  }, [previewFormat]);
+
+  // The preview iframe cannot inherit the app's CSS variables, so we read the
+  // active theme's editor colors and inject them into the HTML preview shell.
+  const previewPalette = useMemo(() => {
+    const styles = getComputedStyle(document.documentElement);
+    return {
+      text: styles.getPropertyValue('--editor-text').trim(),
+      background: styles.getPropertyValue('--editor-bg').trim(),
+    };
+  }, [settings.theme]);
 
   if (!activeNote) {
     return (
@@ -29,7 +42,7 @@ export const Editor: React.FC<EditorProps> = ({ onCursorChange }) => {
     );
   }
 
-  const parsedHtml = parseMarkdownToHtml(activeNote.content);
+  const parsedHtml = previewFormat === 'markdown' ? parseMarkdownToHtml(activeNote.content) : '';
 
   // Dynamic font class
   const getFontFamilyClass = () => {
@@ -108,17 +121,40 @@ export const Editor: React.FC<EditorProps> = ({ onCursorChange }) => {
           />
         </div>
 
-        {/* LIVE MARKDOWN PREVIEW PANE */}
+        {/* LIVE PREVIEW PANE (MARKDOWN OR HTML) */}
         {settings.showPreview && (
-          <div className="flex-1 border-l border-[var(--border-dark)] bg-[var(--editor-bg)] text-[var(--editor-text)] p-4 overflow-y-auto win95-inset">
-            <div className="text-[10px] uppercase font-bold text-gray-500 mb-2 border-b border-gray-300 pb-1 flex justify-between items-center select-none">
-              <span>Markdown Live Preview</span>
-              <span className="font-mono opacity-60">HTML Render</span>
+          <div className="flex-1 flex flex-col border-l border-[var(--border-dark)] bg-[var(--editor-bg)] text-[var(--editor-text)] p-4 overflow-y-auto win95-inset">
+            <div className="text-[10px] uppercase font-bold text-gray-500 mb-2 border-b border-gray-300 pb-1 flex justify-between items-center select-none shrink-0">
+              <span>{previewFormat === 'html' ? 'HTML Live Preview' : 'Markdown Live Preview'}</span>
+              <button
+                type="button"
+                onClick={cycleActiveNoteFormat}
+                title="Preview format: click to cycle Auto → Markdown → HTML (saved with this note)"
+                className="font-mono opacity-60 hover:opacity-100 underline decoration-dotted cursor-pointer"
+              >
+                {activeNote.format
+                  ? previewFormat === 'html' ? 'HTML' : 'Markdown'
+                  : `Auto · ${previewFormat === 'html' ? 'HTML' : 'Markdown'}`}
+              </button>
             </div>
-            <div
-              className="prose max-w-none text-xs leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: parsedHtml }}
-            />
+            {previewFormat === 'html' ? (
+              activeNote.content.trim() ? (
+                <iframe
+                  title="HTML Live Preview"
+                  sandbox=""
+                  srcDoc={buildHtmlPreviewSrcDoc(activeNote.content, previewPalette)}
+                  style={{ backgroundColor: previewPalette.background }}
+                  className="flex-1 min-h-0 w-full border-0"
+                />
+              ) : (
+                <p className="text-xs opacity-50 italic">Empty note...</p>
+              )
+            ) : (
+              <div
+                className="prose max-w-none text-xs leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: parsedHtml }}
+              />
+            )}
           </div>
         )}
       </div>
